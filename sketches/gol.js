@@ -1,158 +1,204 @@
 var grid;
-
-function setup () {
+var timer;
+var speed;
+function setup() {
   createCanvas(400, 400);
   grid = new Grid(20);
   grid.randomize();
-
-  print(grid.isValidPosition(0, 0));
+timer = 0;
+speed= 5;
+print("not knowing where to place the function");
+print("coding is pushing my off the edge with these mind boggling and technical loops");
+print("i would be happy tp add it, but also i would be very nsure becasue since i recieved help with it i feel like i didn't accomplish it by myself");
 }
 
-function draw () {
+function draw() {
   background(250);
-
-  grid.updateNeighborCounts();
-  grid.updatePopulation();
   grid.draw();
-}
-
-function mousePressed() {
-  // grid.updatePopulation();
-
-  // var randomColumn = floor(random(grid.numberOfColumns));
-  // var randomRow = floor(random(grid.numberOfRows));
-
-  // var randomCell = grid.cells[randomColumn][randomRow];
-  // var neighborCount = grid.getNeighbors(randomCell).length;
-
-  // print("cell at " + randomCell.column + ", " + randomCell.row + " has " + neighborCount + " neighbors");
-// print(neighbors.length || "undefined");
-
-  grid.updateNeighborCounts();
-  print(grid.cells);
+if(timer%speed===0){
+  grid.updateNeighborcounts();
+  grid.updatePopulation();
+  }
+  timer++
+  if(timer==400){
+    grid = new Grid(20);
+   grid.randomize();
+   timer=0;
+   gen=0;
+     
+   }
 }
 
 class Grid {
-  constructor (cellSize) {
+  constructor(cellSize) {
     this.cellSize = cellSize;
-    this.numberOfColumns = floor(width / this.cellSize);
-    this.numberOfRows = floor(height / this.cellSize);
+    this.numberOfColumns = width / cellSize;
+    this.numberOfRows = height / cellSize;
 
-    this.cells = new Array(this.numberOfColumns);
-    for (var column = 0; column < this.numberOfColumns; column ++) {
-      this.cells[column] = new Array(this.numberOfRows);
+
+    var x = this.numberOfColumns; // how big the first array should be
+    var y = this.numberOfRows; // how big each array inside of the first array should be
+    var cells = new Array(x);
+    for (var i = 0; i < cells.length; i++) {
+      cells[i] = new Array(y);
     }
-
-    for (var column = 0; column < this.numberOfColumns; column ++) {
+    for (var column = 0; column < this.numberOfColumns; column++) {
       for (var row = 0; row < this.numberOfRows; row++) {
-        this.cells[column][row] = new Cell(column, row, cellSize)
+        cells[column][row] = new Cell(column, row, this.cellSize);
       }
+      this.cells = cells
+
+
     }
-    print(this.cells);
+
   }
+  high(){
+    fill(0)
+     textSize(10);
+     text("high",13,20)
+    noFill();
+    stroke(0);
+    strokeWeight(2);
+    rect(10,10, 30,20);
+     fill(0)
+     textSize(10);
+     text("low",13,50);
+     noFill();
+    stroke(0);
+    strokeWeight(2);
+    rect(10,40, 30,20);
+    
 
-  draw () {
-    for (var column = 0; column < this.numberOfColumns; column ++) {
-      for (var row = 0; row < this.numberOfRows; row++) {
-        this.cells[column][row].draw();
-      }
-    }
+   
+    
   }
+  
+  isValidPosition(column, row) {
+    if (column > width || row > height || column < 0 || row < 0)
+      return false
+    else
+      return true
 
-  randomize () {
-    for (var column = 0; column < this.numberOfColumns; column ++) {
-      for (var row = 0; row < this.numberOfRows; row++) {
-        var value = floor(random(2));
-        this.cells[column][row].setIsAlive(value);
-      }
-    }
   }
-
-  updateNeighborCounts () {
-    for (var column = 0; column < this.numberOfColumns; column ++) {
-      for (var row = 0; row < this.numberOfRows; row++) {
-        var currentCell = this.cells[column][row]
-        currentCell.liveNeighborCount = 0;
-
-        var neighborsArray = this.getNeighbors(currentCell);
-
-        for (var position in neighborsArray) {
-          if (neighborsArray[position].isAlive) {
-            currentCell.liveNeighborCount += 1;
-          }
-        }
-      }
-    }
-  }
-
   getNeighbors(currentCell) {
     var neighbors = [];
+    for (var xOffset = -1; xOffset <= 1; xOffset++) {
+      for (var yOffset = -1; yOffset <= 1; yOffset++) {
+        var neighborColumn = currentCell.column + xOffset;
+        var neighborRow = currentCell.row + yOffset;
+        if (grid.isValidPosition(neighborColumn, neighborRow) == true && !(xOffset == 0 && yOffset == 0) && this.cells[neighborColumn][neighborRow].isalive)
+          neighbors.push(this.cells[neighborColumn][neighborRow]);
+        else;
 
-    for (var columnOffset = -1; columnOffset <= 1; columnOffset++) {
-      for (var rowOffset = -1; rowOffset <= 1; rowOffset++) {
-        var neighborX = currentCell.column + columnOffset;
-        var neighborY = currentCell.row + rowOffset;
-
-        if (this.isValidPosition(neighborX, neighborY)) {
-          var neighborCell = this.cells[neighborX][neighborY];
-
-          if (neighborCell != currentCell) {
-            neighbors.push(neighborCell);
-          }
-        }
+        // do something with neighborColumn and neighborRow
       }
     }
+
+    // add logic to get neighbors and add them to the array
 
     return neighbors;
   }
 
-  isValidPosition (column, row) {
-    var validColumn = column >= 0 && column < this.numberOfColumns;
-    var validRow = row >= 0 && row < this.numberOfRows
+  randomize() {
+    for (var column = 0; column < this.numberOfColumns; column++) {
+      for (var row = 0; row < this.numberOfRows; row++) {
+        this.cells[column][row].setisAlive(floor(random(2)));
+      }
+    }
 
-    return  validColumn && validRow;
   }
+  draw() {
+    for (var column = 0; column < this.numberOfColumns; column++) {
+      for (var row = 0; row < this.numberOfRows; row++) {
+        this.cells[column][row].draw();
 
-  updatePopulation () {
-    for (var column = 0; column < this.numberOfColumns; column ++) {
+
+
+      }
+
+
+    }
+    grid.high()
+}
+  updatePopulation() {
+    for (var column = 0; column < this.numberOfColumns; column++) {
       for (var row = 0; row < this.numberOfRows; row++) {
         this.cells[column][row].liveOrDie();
       }
     }
+
+
+  }
+  updateNeighborcounts() {
+    for (var column = 0; column < this.numberOfColumns - 1; column++) {
+      for (var row = 0; row < this.numberOfRows - 1; row++) {
+        this.cells[column][row].liveNeighborcount = 0;
+        this.cells[column][row].liveNeighborcount = grid.getNeighbors(this.cells[column][row]).length;
+
+      }
+    }
   }
 }
-
 class Cell {
-  constructor (column, row, size) {
+  constructor(column, row, size) {
     this.column = column;
     this.row = row;
     this.size = size;
-    this.isAlive = false;
-    this.liveNeighborCount = 0;
+    this.isalive = false;
+    this.liveNeighborcount = 0
+
+
   }
 
-  draw () {
-    if (this.isAlive) {
-      fill(color(200, 0, 200));
+  liveOrDie() {
+    if (this.liveNeighborcount < 2 && this.isalive === true)
+      this.isalive = false
+    else if (this.liveNeighborcount <= 3 && this.isalive === true)
+      this.isalivealive = true
+    if (this.liveNeighborcount > 3 && this.isalive === true)
+      this.isalive = false
+    if (this.liveNeighborcount == 3 && this.isalive === false)
+      this.isalive = true
+  }
+
+
+
+
+  setisAlive(box) {
+    if (box == true)
+      this.isalive = true;
+    else
+      this.isalive = false;
+
+
+  }
+  draw() {
+    if (this.isalive) {
+      fill(color(100, 0, 0))
     } else {
-      fill(color(240));
+      fill(color(200, 0, 0))
     }
     noStroke();
     rect(this.column * this.size + 1, this.row * this.size + 1, this.size - 1, this.size - 1);
   }
 
-  setIsAlive (value) {
-    if (value) {
-      this.isAlive = true;
-    } else {
-      this.isAlive = false;
-    }
-  }
 
-  liveOrDie () {
-    if      (this.isAlive && this.liveNeighborCount <  2) this.isAlive = false;   // Loneliness
-    else if (this.isAlive && this.liveNeighborCount >  3) this.isAlive = false;   // Overpopulation
-    else if (!this.isAlive && this.liveNeighborCount === 3)  this.isAlive = true; // Reproduction
-    // otherwise stay the same
-  }
+
+}
+
+function mousePressed() {
+  
+  
+checkHigh()
+checkLow()
+}
+function checkHigh(){
+  if((mouseX>=10 && mouseX<=40) && (mouseY>= 10 && mouseY<=30))
+  speed --
+  
+}
+function checkLow(){
+  if((mouseX>=10 && mouseX<=40) && (mouseY>= 40 && mouseY<=60))
+  speed ++
+  
 }
